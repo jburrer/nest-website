@@ -30,5 +30,9 @@ def finances():
 def calc():
     return render_template('calc.html')
 
+@app.route('/statement')
+def statement():
+    return render_template('statement.html')
+
 if __name__ == '__main__':
     app.run()
