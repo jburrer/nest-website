@@ -5,6 +5,9 @@ table {
     table-layout: fixed;
     text-align: center;
 }
+.date-link {
+    color: var(--alt-hl);
+}
 {% endblock %}
 
 {% block bottomlinks %}
@@ -13,257 +16,105 @@ table {
 {% endblock %}
 
 {% block content %}
+
+<script>
+  function copyTableLink(linkId) {
+      navigator.clipboard.writeText("https://thenest207.live/finances#" + linkId);
+  }
+</script>
+
 <h1>Finances</h1>
-<h2>Note: this page is under construction. Any info here is incorrect.</h2>
-<p>&emsp;&emsp;This page holds the record of who got paid what after each of our shows, updated immediately when that a show finishes and the artists and staff are paid out. It shows how much we made at door and exactly where that money goes.</p>
-<p>&emsp;&emsp;Here’s how it works for each role:</p>
-<h3>House</h3>
-<p>&emsp;&emsp;This refers to the people that live at the location we’re using. You may notice that payouts to bands are lower than they used to be when we hosted at our own house, and this is key reason why. Now that we rely on community members to offer up their spaces, we need to pay them a portion of the money brought in to account for the significant liability and chaos they take on. They get paid a constant $200. The only exception is if we’re using our house, in which case we don’t take any additional house fee.</p>
-<h3>Poster</h3>
-<p>&emsp;&emsp;This refers to the artist we commissioned to create the poster used to advertise show. They get paid a constant $25.</p>
-<h3>Photos</h3>
-<p>&emsp;&emsp;This refers to the photographers taking photos of bands during their sets. We always commission one photographer per set (sometimes that’s one for the whole night, sometimes it’s one for the first 2 sets and another for the next 2, etc). They get paid $20 per set.</p>
-  <p>&emsp;&emsp;(For simplicity’s sake on this sheet, the total money for photographers is calculated as 20 * (number of bands), and then calculated per photographer by dividing by the number of photographers. There may be cases where photographers don’t work even amounts of sets (like one for 3 sets, one for 2, etc), in which case the spreadsheet won’t exactly match what we pay out)</p>
-<h3>Nest Staff</h3>
-<p>&emsp;&emsp;We bring along our own staff members for tasks such as running door, monitoring the crowd to deal with safety issues, running sound, and more. They are absolutely critical to maintaining a safe and fun atmosphere for the audience, ensuring anyone makes money by insisting the audience members pay at the door, making sure the show stays on schedule and the bands sound their best, etc. They evenly split 20% of the total income.</p>
-  <p>&emsp;&emsp;(It’s worth noting that Johnny and Damian are not included in this category)</p>
-<h3>Nest</h3>
-<p>&emsp;&emsp;40% of the total income goes to the Nest as an organization. All these funds are put toward opening a brick-and-mortar music venue here in West Lafayette in the near future. In practice, these costs are assorted filing fees for legal documents, occasional legal consultation, architectural fees, and other similar expenses. It also gets used occasionally to repair or replace broken equipment.</p>
-<h3>Bands</h3>
-<p>&emsp;&emsp;The remaining money is split evenly between the bands on the bill. The total amount being split between them will always match the Nest’s cut.</p>
 
-<!--
+<p>&emsp;&emsp;<b>For summer shows, the Nest receives an equal cut to that of the bands, which is then split between the staff working that event.</b> For instance, for a show that brought in $100 with 4 bands and 4 staff, the cut will be split 5 ways, which each band getting $20 and the staff splitting the additional $20 to each get $5. For simplicity, each cut is rounded down to the nearest whole dollar, and any dollars left over remain with the Nest.</p>
 
-<br>
+<center>
+  <h1>Past Show Breakdowns</h1>
+</center>
 
-<h2>4/24/26</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Total</th>
-      <th>House</th>
-      <th>Staff</th>
-      <th>Artists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Total</th>
-      <td>1000</td>
-      <td>400</td>
-      <td>200</td>
-      <td>400</td>
-    </tr>
-    <tr>
-      <th>Split Between</th>
-      <td></td>
-      <td>1</td>
-      <td>5</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Each</th>
-      <td></td>
-      <td>400</td>
-      <td>40</td>
-      <td>80</td>
-    </tr>
-  </tbody>
-</table>
+<div id="show-tables"></div>
 
-<br><br>
+<script>
 
-<h2>4/17/26</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Total</th>
-      <th>House</th>
-      <th>Staff</th>
-      <th>Artists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Total</th>
-      <td>1000</td>
-      <td>400</td>
-      <td>200</td>
-      <td>400</td>
-    </tr>
-    <tr>
-      <th>Split Between</th>
-      <td></td>
-      <td>1</td>
-      <td>5</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Each</th>
-      <td></td>
-      <td>400</td>
-      <td>40</td>
-      <td>80</td>
-    </tr>
-  </tbody>
-</table>
+  const showTableTemplate = `
+    <h2 id="DATE_ID">
+      <a class="date-link" href="https://thenest207.live/finances#DATE_ID">DATE</a>
+    </h2>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Total</th>
+          <th>Nest</th>
+          <th>Staff</th>
+          <th>Performers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Total</th>
+          <td>INCOME</td>
+          <td>NEST_CUT</td>
+          <td>STAFF_TOTAL</td>
+          <td>PERF_TOTAL</td>
+        </tr>
+        <tr>
+          <th>Split Between</th>
+          <td></td>
+          <td>Nest</td>
+          <td>NUM_STAFF Staff Members</td>
+          <td>PERFORMERS</td>
+        </tr>
+        <tr>
+          <th>Each</th>
+          <td></td>
+          <td>NEST_CUT</td>
+          <td>STAFF_CUT</td>
+          <td>PERF_CUT</td>
+        </tr>
+      </tbody>
+    </table>
+    `
 
-<br><br>
+  fetch("finances_get")
+    .then(response => response.json())
+    .then(data => {
 
-<h2>4/10/26</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Total</th>
-      <th>House</th>
-      <th>Staff</th>
-      <th>Artists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Total</th>
-      <td>1000</td>
-      <td>400</td>
-      <td>200</td>
-      <td>400</td>
-    </tr>
-    <tr>
-      <th>Split Between</th>
-      <td></td>
-      <td>1</td>
-      <td>5</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Each</th>
-      <td></td>
-      <td>400</td>
-      <td>40</td>
-      <td>80</td>
-    </tr>
-  </tbody>
-</table>
+        let showTablesStr = "";
+        for (const [i, show] of data.entries()) {
 
-<br><br>
+            const date = new Date(show.date)
+                  .toLocaleDateString("en-US", {timeZone: "GMT"});
 
-<h2>4/3/26</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Total</th>
-      <th>House</th>
-      <th>Staff</th>
-      <th>Artists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Total</th>
-      <td>1000</td>
-      <td>400</td>
-      <td>200</td>
-      <td>400</td>
-    </tr>
-    <tr>
-      <th>Split Between</th>
-      <td></td>
-      <td>1</td>
-      <td>5</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Each</th>
-      <td></td>
-      <td>400</td>
-      <td>40</td>
-      <td>80</td>
-    </tr>
-  </tbody>
-</table>
+            const staffTotal = show.staffPayout * show.numStaff;
+            const perfTotal = show.performers[0].payout * show.performers.length;
 
-<br><br>
+            let performers = "";
+            for (performer of show.performers) {
+                performers += performer.name + "<br>";
+            }
 
-<h2>3/28/26</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Total</th>
-      <th>House</th>
-      <th>Staff</th>
-      <th>Artists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Total</th>
-      <td>1000</td>
-      <td>400</td>
-      <td>200</td>
-      <td>400</td>
-    </tr>
-    <tr>
-      <th>Split Between</th>
-      <td></td>
-      <td>1</td>
-      <td>5</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Each</th>
-      <td></td>
-      <td>400</td>
-      <td>40</td>
-      <td>80</td>
-    </tr>
-  </tbody>
-</table>
+            showTablesStr += showTableTemplate
+                .replaceAll("DATE_ID", date.replaceAll("/", "-"))
+                .replaceAll("DATE", date)
+                .replaceAll("INCOME", show.income)
+                .replaceAll("NEST_CUT", show.nestCut)
+                .replaceAll("STAFF_TOTAL", staffTotal)
+                .replaceAll("PERF_TOTAL", perfTotal)
+                .replaceAll("NUM_STAFF", show.numStaff)
+                .replaceAll("PERFORMERS", performers)
+                .replaceAll("STAFF_CUT", show.staffPayout)
+                .replaceAll("PERF_CUT", show.performers[0].payout);
 
-<br><br>
+            if (i !== data.length -1) {
+                showTablesStr += "<br>";
+            }
 
-<h2>2/28/26</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th>Total</th>
-      <th>House</th>
-      <th>Staff</th>
-      <th>Artists</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Total</th>
-      <td>1000</td>
-      <td>400</td>
-      <td>200</td>
-      <td>400</td>
-    </tr>
-    <tr>
-      <th>Split Between</th>
-      <td></td>
-      <td>1</td>
-      <td>5</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Each</th>
-      <td></td>
-      <td>400</td>
-      <td>40</td>
-      <td>80</td>
-    </tr>
-  </tbody>
-</table>
+        }
 
-<br>
+        document.getElementById("show-tables").innerHTML = showTablesStr;
 
--->
+    });
+
+</script>
 
 {% endblock %}

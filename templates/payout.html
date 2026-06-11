@@ -1,0 +1,679 @@
+{% extends "layout.html" %}
+
+{% block style %}
+p {
+    padding-bottom: 2%;
+}
+table {
+    font-size: 1.5em;
+    text-align: center;
+}
+.sub-th {
+    color: white;
+    font-weight: normal;
+}
+input {
+    font-size: 1em;
+    background-color: transparent;
+    color: yellow;
+    border: none;
+    font-family: Times New Roman;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+}
+.add {
+    background-color: var(--alt-bg-1);
+    border: 5px outset var(--alt-bg-1);
+    color: var(--hl);
+    font-size: 0.75em;
+    font-family: Times New Roman;
+    width: 100%;
+    height: 100%;
+}
+.add:hover {
+    border: 5px inset var(--alt-bg-1);
+}
+.remove {
+    background-color: firebrick;
+    border: 5px outset firebrick;
+    color: var(--hl);
+    font-size: 0.75em;
+    font-family: Times New Roman;
+    width: 100%;
+    height: 100%;
+}
+.remove:hover {
+    border: 5px inset firebrick;
+}
+#save{
+    background-color: var(--alt-bg-1);
+    border: 5px outset var(--alt-bg-1);
+    color: var(--hl);
+    font-family: Times New Roman;
+    font-size: 1.5em;
+    padding-left: 5%;
+    padding-right: 5%;
+    float: left;
+}
+#save:hover {
+    border: 5px inset var(--alt-bg-1);
+}
+#publish {
+    background-color: var(--alt-bg-2);
+    border: 5px outset var(--alt-bg-2);
+    color: var(--hl);
+    font-family: Times New Roman;
+    font-size: 1.5em;
+    padding-left: 5%;
+    padding-right: 5%;
+    float: right;
+}
+#publish:hover {
+    border: 5px inset var(--alt-bg-2);
+}
+#payout-complete {
+    display: none;
+    text-align: center;
+}
+#payout-link {
+    color: var(--text);
+}
+#payout-link-copy{
+    background-color: var(--alt-bg-1);
+    border: 5px outset var(--alt-bg-1);
+    color: var(--hl);
+    font-family: Times New Roman;
+    font-size: 0.75em;
+}
+{% endblock %}
+
+{% block content %}
+
+<script>
+
+  let performers = [];
+  let staff = [];
+  let photographers = [];
+  let posterArtists = [];
+  let nestCut = 0;
+
+  fetch("payout_get")
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.date === null) {
+            document.getElementById("date").value = "";
+        } else {
+            document.getElementById("date").valueAsDate = new Date(data.date);
+        }
+        document.getElementById("cashIncome").value = data.cash;
+        document.getElementById("venmoIncome").value = data.venmo;
+
+        for (performer of data.performers) {
+            let newPerformer = {
+                name: performer.name,
+                venmo: performer.venmo,
+                payout: 0
+            };
+            performers.push(newPerformer);
+        }
+
+        for (staffer of data.staff) {
+            let newStaff= {
+                name: staffer.name,
+                venmo: staffer.venmo,
+                payout: 0
+            };
+            staff.push(newStaff);
+        }
+
+        update();
+
+    });
+
+  const performerRowHTML = `
+    <tr id="performerINDEX">
+      <td>
+        <input id="performerINDEX-name"
+               type="text"
+               onChange="updatePerformer(INDEX)"
+               placeholder="NAME" />
+      </td>
+      <td>
+        <input id="performerINDEX-venmo"
+               type="text"
+               onChange="updatePerformer(INDEX)"
+               value="VENMO" />
+      </td>
+      <td>$PAYOUT</td>
+      <td>
+        <button class="remove" onClick="removePerformer(INDEX)">Remove</button>
+      </td>
+    </tr>
+  `;
+
+  const staffRowHTML = `
+    <tr id="staffINDEX">
+      <td>
+        <input id="staffINDEX-name"
+               type="text"
+               onChange="updateStaff(INDEX)"
+               placeholder="NAME" />
+      </td>
+      <td>
+        <input id="staffINDEX-venmo"
+               type="text"
+               onChange="updateStaff(INDEX)"
+               value="VENMO" />
+      </td>
+      <td>$PAYOUT</td>
+      <td>
+        <button class="remove" onClick="removeStaff(INDEX)">Remove</button>
+      </td>
+    </tr>
+  `;
+
+  const photographerRowHTML = `
+    <tr id="photographerINDEX">
+      <td>
+        <input id="photographerINDEX-name"
+               type="text"
+               onChange="updatePhotographer(INDEX)"
+               placeholder="NAME" />
+      </td>
+      <td>
+        <input id="photographerINDEX-venmo"
+               type="text"
+               onChange="updatePhotographer(INDEX)"
+               value="VENMO" />
+      </td>
+      <td>$PAYOUT</td>
+      <td>
+        <button class="remove" onClick="removePhotographer(INDEX)">Remove</button>
+      </td>
+    </tr>
+  `;
+
+  const posterArtistRowHTML = `
+    <tr id="posterArtistINDEX">
+      <td>
+        <input id="posterArtistINDEX-name"
+               type="text"
+               onChange="updatePosterArtist(INDEX)"
+               placeholder="NAME" />
+      </td>
+      <td>
+        <input id="posterArtistINDEX-venmo"
+               type="text"
+               onChange="updatePosterArtist(INDEX)"
+               value="VENMO" />
+      </td>
+      <td>$PAYOUT</td>
+      <td>
+        <button class="remove" onClick="removePosterArtist(INDEX)">Remove</button>
+      </td>
+    </tr>
+  `;
+
+  const addPerformerHTML = `
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addPerformer()">Add Performer</button>
+      </td>
+    </tr>
+  `;
+
+  const addStaffHTML = `
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addStaff()">Add Staff Member</button>
+      </td>
+    </tr>
+  `;
+
+  const addPhotographerHTML = `
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addPhotographer()">Add Photographer</button>
+      </td>
+    </tr>
+  `;
+
+  const addPosterArtistHTML = `
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addPosterArtist()">Add Poster Artist</button>
+      </td>
+    </tr>
+  `;
+
+  function update() {
+      updatePayout();
+      updatePerformerTable();
+      updateStaffTable();
+  }
+
+  function updatePayout() {
+      let cashIncome = parseInt(document.getElementById("cashIncome").value);
+      let venmoIncome = parseInt(document.getElementById("venmoIncome").value);
+      let totalIncome = cashIncome + venmoIncome;
+
+      let performerPayout = 0;
+      let staffPayout = 0;
+      let leftover = 0;
+
+      if (performers.length > 0) {
+          if (staff.length > 0) {
+              performerPayout = Math.floor(totalIncome / (performers.length + 1));
+              leftover = totalIncome % (performers.length + 1);
+              staffPayout = Math.floor(performerPayout / staff.length);
+              leftover += performerPayout % staff.length;
+          } else {
+              performerPayout = Math.floor(totalIncome / performers.length);
+              leftover = totalIncome % performers.length;
+          }
+      }
+
+      for (performer of performers) {
+          performer.payout = performerPayout; 
+      }
+
+      for (staffer of staff) {
+          staffer.payout = staffPayout; 
+      }
+
+      nestCut = leftover;
+      document.getElementById("nestCut").textContent = "$" + nestCut;
+
+  }
+
+  function addPerformer() {
+      let newPerformer = {
+          name: "None",
+          venmo: "Cash",
+          payout: 0
+      };
+      performers.push(newPerformer);
+      update();
+  }
+
+  function updatePerformer(index) {
+      performers[index].name = document.getElementById("performer" + index + "-name").value;
+      performers[index].venmo = document.getElementById("performer" + index + "-venmo").value;
+  }
+
+  function removePerformer(index) {
+      performers.splice(index, 1);
+      update();
+  }
+
+  function updatePerformerTable() {
+      let performersTableStr = "";
+      for (let i = 0; i < performers.length; i++) {
+          performersTableStr += performerRowHTML
+              .replaceAll("INDEX", i)
+              .replaceAll("NAME", performers[i].name)
+              .replaceAll("VENMO", performers[i].venmo)
+              .replaceAll("PAYOUT", performers[i].payout);
+      }
+      performersTableStr += addPerformerHTML;
+      document.getElementById("performersTableBody").innerHTML = performersTableStr;
+  }
+
+  function addStaff() {
+      let newStaff = {
+          name: "None",
+          venmo: "Cash",
+          payout: 0
+      };
+      staff.push(newStaff);
+      update();
+  }
+
+  function updateStaff(index) {
+      staff[index].name = document.getElementById("staff" + index + "-name").value;
+      staff[index].venmo =
+              document.getElementById("staff" + index + "-venmo").value;
+  }
+
+  function removeStaff(index) {
+      staff.splice(index, 1);
+      update();
+  }
+
+  function updateStaffTable() {
+      let staffTableStr = "";
+      for (let i = 0; i < staff.length; i++) {
+          staffTableStr += staffRowHTML
+              .replaceAll("INDEX", i)
+              .replaceAll("NAME", staff[i].name)
+              .replaceAll("VENMO", staff[i].venmo)
+              .replaceAll("PAYOUT", staff[i].payout);
+      }
+      staffTableStr += addStaffHTML;
+      document.getElementById("staffTableBody").innerHTML = staffTableStr;
+  }
+
+  function addPhotographer() {
+      let newPhotographer = {
+          name: "None",
+          venmo: "Cash"
+      };
+      photographers.push(newPhotographer);
+      updatePhotographersTable();
+  }
+
+  function updatePhotographer(index) {
+      photographers[index].name =
+          document.getElementById("photographer" + index + "-name").value;
+      photographers[index].venmo =
+          document.getElementById("photographer" + index + "-venmo").value;
+  }
+
+  function removePhotographer(index) {
+      photographers.splice(index, 1);
+      updatePhotographersTable();
+  }
+
+  function updatePhotographersTable() {
+      let photographersTableStr = "";
+      for (let i = 0; i < photographers.length; i++) {
+          photographersTableStr += photographerRowHTML
+              .replaceAll("INDEX", i)
+              .replaceAll("NAME", photographers[i].name)
+              .replaceAll("VENMO", photographers[i].venmo);
+      }
+      photographersTableStr += addPhotographerHTML;
+      document.getElementById("photographersTableBody").innerHTML =
+              photographersTableStr;
+  }
+
+  function addPosterArtist() {
+      let newPosterArtist = {
+          name: "None",
+          venmo: "Cash"
+      };
+      posterArtists.push(newPosterArtist);
+      updatePosterArtistsTable();
+  }
+
+  function updatePosterArtist(index) {
+      posterArtists[index].name = document.getElementById("posterArtist" + index + "-name").value;
+      posterArtists[index].venmo = document.getElementById("posterArtist" + index + "-venmo").value;
+  }
+
+  function removePosterArtist(index) {
+      posterArtists.splice(index, 1);
+      updatePosterArtistsTable();
+  }
+
+  function updatePosterArtistsTable() {
+      let posterArtistsTableStr = "";
+      for (let i = 0; i < posterArtists.length; i++) {
+          posterArtistsTableStr += posterArtistRowHTML
+              .replaceAll("INDEX", i)
+              .replaceAll("NAME", posterArtists[i].name)
+              .replaceAll("VENMO", posterArtists[i].venmo);
+      }
+      posterArtistsTableStr += addPosterArtistHTML;
+      document.getElementById("posterArtistsTableBody").innerHTML =
+              posterArtistsTableStr;
+  }
+
+  async function save(reload = true) {
+
+      let date = document.getElementById("date").value;
+      if (date === "") {
+          alert("Error: A date must be set to save or publish.");
+          return false;
+      } else if (performers.length == 0) {
+          alert("Error: Need at least 1 performer to publish.");
+          return false;
+      } else if (staff.length == 0) {
+          alert("Error: Need at least 1 staff member to publish.");
+          return false;
+      } else {
+
+          for (performer of performers) {
+              if (performer.name === "None") {
+                  alert("Error: Need to set performers' names to publish.");
+                  return false;
+              }
+          }
+
+          let data = new FormData();
+          data.append("date", date);
+          data.append("cashIncome", document.getElementById("cashIncome").value);
+          data.append("venmoIncome", document.getElementById("venmoIncome").value);
+          data.append("nestCut", nestCut);
+          data.append("performers", JSON.stringify(performers));
+          data.append("staff", JSON.stringify(staff));
+          data.append("photographers", JSON.stringify(photographers));
+          data.append("posterArtists", JSON.stringify(posterArtists));
+
+          const response = await fetch("payout_save", {
+              "method": "POST",
+              "body": data 
+          });
+          const message = await response.text();
+
+          if (message === "success") {
+              if (reload) {
+                  location.reload();
+              }
+              return true;
+          } else {
+              alert(message);
+              return false;
+          }
+      }
+  }
+
+  async function publish() {
+      if (await save(false)) {
+
+          const dateStr = new Date(document.getElementById("date").value)
+                  .toLocaleDateString("en-US", {timeZone: "GMT"})
+                  .replaceAll("/", "-");
+          const payoutLink = "https://thenest207.live/finances#" + dateStr;
+
+          fetch("payout_publish")
+          .then(response => response.text())
+          .then(message => {
+              if (message === "success") {
+                  document.getElementById("payout-complete").style.display =
+                          "block";
+                  document.getElementById("payout-link").text = payoutLink;
+                  document.getElementById("payout-link").href = payoutLink;
+              } else {
+                  alert(message);
+              }
+          });
+      }
+  }
+
+  function copyPayoutLink() {
+      navigator.clipboard.writeText(document.getElementById("payout-link").text);
+  }
+
+</script>
+
+
+<h1>Calculate Show Payouts</h1>
+
+<p>&emsp;&emsp;<b>For summer shows, the Nest receives an equal cut to that of the bands, which is then split between the staff working that event.</b> For instance, for a show that brought in $100 with 4 bands and 4 staff, the cut will be split 5 ways, which each band getting $20 and the staff splitting the additional $20 to each get $5. For simplicity, each cut is rounded down to the nearest whole dollar, and any dollars left over remain with the Nest.</p>
+
+<table>
+  <colgroup>
+    <col style="width:20%">
+    <col style="width:40%">
+    <col style="width:40%">
+  </colgroup>  
+  <tbody>
+    <tr>
+      <th>Date</th>
+      <td colspan="2">
+        <input id="date" type="date"/>
+      </td>
+    </tr>
+    <tr>
+      <th>Income</th>
+      <td>
+        Cash:
+        <input id="cashIncome" type="number" value="0" onChange="update()" />
+      </td>
+      <td colspan="2">
+        Venmo:
+        <input id="venmoIncome" type="number" value="0" onChange="update()" />
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table>
+  <colgroup>
+    <col style="width:30%">
+    <col style="width:30%">
+    <col style="width:20%">
+    <col style="width:20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th colspan="4">Performers</th>
+    </tr>
+    <tr>
+      <th class="sub-th">Name</th>
+      <th class="sub-th">Venmo</th>
+      <th class="sub-th">Owed</th>
+      <th class="sub-th">Action</th>
+    </tr>
+  </thead>
+  <tbody id="performersTableBody">
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addPerformer()">Add Performer</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table>
+  <colgroup>
+    <col style="width:30%">
+    <col style="width:30%">
+    <col style="width:20%">
+    <col style="width:20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th colspan="4">Staff</th>
+    </tr>
+    <tr>
+      <th class="sub-th">Name</th>
+      <th class="sub-th">Venmo</th>
+      <th class="sub-th">Owed</th>
+      <th class="sub-th">Action</th>
+    </tr>
+  </thead>
+  <tbody id="staffTableBody">
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addStaff()">Add Staff</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table>
+  <colgroup>
+    <col style="width:30%">
+    <col style="width:30%">
+    <col style="width:20%">
+    <col style="width:20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th colspan="4">Photographers</th>
+    </tr>
+    <tr>
+      <th class="sub-th">Name</th>
+      <th class="sub-th">Venmo</th>
+      <th class="sub-th">Owed</th>
+      <th class="sub-th">Action</th>
+    </tr>
+  </thead>
+  <tbody id="photographersTableBody">
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addPhotographer()">Add Photographer</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table>
+  <colgroup>
+    <col style="width:30%">
+    <col style="width:30%">
+    <col style="width:20%">
+    <col style="width:20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th colspan="4">Poster Artists</th>
+    </tr>
+    <tr>
+      <th class="sub-th">Name</th>
+      <th class="sub-th">Venmo</th>
+      <th class="sub-th">Owed</th>
+      <th class="sub-th">Action</th>
+    </tr>
+  </thead>
+  <tbody id="posterArtistsTableBody">
+    <tr>
+      <td colspan="4">
+        <button class="add" onclick="addPosterArtist()">Add Poster Artist</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table>
+  <colgroup>
+    <col style="width:30%">
+    <col style="width:70%">
+  </colgroup>  
+  <tbody>
+    <tr>
+      <th>Nest Cut</th>
+      <td id="nestCut">$0</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<button id="save" onClick="save()">Save</button>
+<button id="publish" onClick="publish()">Publish</button>
+
+<div id="payout-complete">
+  <h1>Payout Completed</h1>
+  <p>
+    <a id="payout-link"></a>
+    &nbsp;
+    <button id="payout-link-copy" onClick="copyPayoutLink()">Copy</button>
+  </p>
+</div>
+
+{% endblock %}

@@ -11,6 +11,13 @@
     max-width: 80%;
     max-height: 500px;
 }
+#toc {
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+#toc-list {
+    margin: 0;
+}
 {% endblock %}
 
 {% block toplinks %}
@@ -23,6 +30,43 @@
 {% block content %}
 
 <h1>About The Nest</h1>
+
+<div id="toc">
+  <h2>Table of Contents</h2>
+  <ul id="toc-list">
+    <li><a href="#our-history"><h3>Our History</h3></a></li>
+    <li><a href="#how-we-operate"><h3>How We Operate</h3></a></li>
+    <ul>
+      <li><h4>Teams</h4></li>
+      <ul>
+        <li>Tech</li>
+        <li>Booking</li>
+        <li>Promotion</li>
+        <li>Security</li>
+        <li>Merchandise</li>
+      </ul>
+      <li><h4>Positions</h4></li>
+      <li><h4>Meetings</h4></li>
+      <li><h4>Onboarding</h4></li>
+      <li><h4>Removal</h4></li>
+      <li><h4>Proposals</h4></li>
+      <ul>
+        <li>New Member Proposal</li>
+        <li>Member Removal Proposal</li>
+        <li>Amendment Proposal</li>
+      </ul>
+      <li><h4>Finances</h4></li>
+      <li><h4>Pay Structure</h4></li>
+      <ul>
+        <li>Summer</li>
+        <li>School Year</li>
+        <li>Brick and Mortar</li>
+      </ul>
+    </ul>
+  </ul>
+</div>
+
+<h1 id="our-history">Our History</h1>
 
 <p>&emsp;&emsp;Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development. It is typically a corrupted version of De finibus bonorum et malorum, a 1st-century BC text by the Roman statesman and philosopher Cicero, with words altered, added, and removed to make it nonsensical and improper Latin. The first two words are the truncation of dolorem ipsum. More at WikipediaAliquam facilis voluptatem sint consequatur voluptates ut itaque et. Saepe nisi et libero quaerat eius adipisci. Veritatis quibusdam consequatur est in est impedit quae. Consectetur cum maiores et saepe omnis et molestiae illo. Occaecati incidunt voluptas est architecto. Veritatis soluta numquam ea nesciunt ut. Pariatur officia recusandae neque sed ducimus nobis. Consequuntur qui voluptates deserunt consectetur qui consequuntur nobis deserunt. Maiores molestias ut ut. Tempora quia sequi reprehenderit culpa sunt explicabo iure. Praesentium numquam explicabo et optio eos sapiente maxime. Vel non libero velit aut soluta aspernatur dolores sint. Corporis reprehenderit sed temporibus perferendis. Voluptas eum rem qui. Sequi harum fugit voluptas et possimus perspiciatis. Placeat quasi numquam odit et quae. Doloribus autem omnis qui dolores ducimus voluptas rerum. Aut quis voluptatem aut possimus quo facere. Explicabo est et minus optio ad voluptatem dignissimos id. Quam minima fugit odit expedita necessitatibus. Deleniti id error in magnam. Adipisci laborum et ducimus. Vero velit illo aut consequatur est pariatur cumque veritatis. Consequatur et ut illo.</p>
 
@@ -55,5 +99,45 @@
   <img src="{{ url_for('static', filename='309.jpg') }}">
   <p>309 N St, the location for the Nest's next phase!</p>
 </div>
+
+<h1 id="how-we-operate">How We Operate</h1>
+
+<h2 id="teams">Teams</h2>
+
+<h3 id="tech">Tech</h3>
+
+<h3 id="booking">Booking</h3>
+
+<h3 id="promotion">Promotion</h3>
+
+<h3 id="security">Security</h3>
+
+<h3 id="merchandise">Merchandise</h3>
+
+<h2 id="positions">Positions</h2>
+
+<h2 id="meetings">Meetings</h2>
+
+<h2 id="onboarding">Onboarding</h2>
+
+<h2 id="removal">Removal</h2>
+
+<h2 id="proposals">Proposals</h2>
+
+<h3 id="new-member-proposal">New Member Proposal</h3>
+
+<h3 id="member-removal-proposal">Member Removal Proposal</h3>
+
+<h3 id="amendment-proposal">Amendment Proposal</h3>
+
+<h2 id="finances">Finances</h2>
+
+<h2 id="pay-structure">Pay Structure</h2>
+
+<h3 id="summer">Summer</h3>
+
+<h3 id="school-year">School Year</h3>
+
+<h3 id="brick-and-mortar">Brick and Mortar</h3>
 
 {% endblock %}
