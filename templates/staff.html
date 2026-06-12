@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block style %}
+@media screen and (max-width: 650px) {
+    table {
+        font-size: 0.75em !important;
+    }
+    #save {
+        font-size: 1em !important;
+    }
+}
+h1 {
+    margin-bottom: 1dvh;
+}
+table {
+    font-size: 1.5em;
+    table-layout: fixed;
+    text-align: center;
+}
+input {
+    font-size: 1em;
+    background-color: transparent;
+    color: yellow;
+    border: none;
+    font-family: Times New Roman;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+}
+.add {
+    background-color: var(--alt-bg-1);
+    border: 5px outset var(--alt-bg-1);
+    color: var(--hl);
+    font-size: 0.75em;
+    font-family: Times New Roman;
+    width: 100%;
+    height: 100%;
+}
+.add:hover {
+    border: 5px inset var(--alt-bg-1);
+}
+.remove {
+    background-color: firebrick;
+    border: 5px outset firebrick;
+    color: var(--hl);
+    font-size: 0.75em;
+    font-family: Times New Roman;
+    width: 100%;
+    height: 100%;
+}
+.remove:hover {
+    border: 5px inset firebrick;
+}
+#save {
+    background-color: var(--alt-bg-1);
+    border: 5px outset var(--alt-bg-1);
+    color: var(--hl);
+    font-family: Times New Roman;
+    font-size: 1.5em;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-top: 2dvh;
+}
+#save:hover {
+    border: 5px inset var(--alt-bg-1);
+}
+{% endblock %}
+
+{% block content %}
+
+<script>
+
+  let staff = [];
+
+  fetch("staff_get")
+    .then(response => response.json())
+    .then(data => {
+        staff = data;
+        update();
+    });
+
+  const rowHTML = `
+    <tr id="staffINDEX">
+      <td>
+        <input id="staffINDEX-name"
+               type="text"
+               onChange="updateName(INDEX)"
+               placeholder="Enter name"
+               value="NAME" />
+      </td>
+      <td>
+        <input id="staffINDEX-venmo"
+               type="text"
+               onChange="updateVenmo(INDEX)"
+               placeholder="@"
+               value="VENMO" />
+      </td>
+      <td>
+        <button class="remove" onClick="remove(INDEX)">Remove</button>
+      </td>
+    </tr>
+  `;
+
+  const addStaffHTML = `
+    <tr>
+      <td colspan="3">
+        <button class="add" onClick="add()">Add Staff Member</button>
+      </td>
+    </tr>
+  `
+
+  function updateName(index) {
+      staff[index].name =
+              document.getElementById("staff" + index + "-name").value;
+  }
+
+  function updateVenmo(index) {
+      staff[index].venmo =
+              document.getElementById("staff" + index + "-venmo").value;
+  }
+
+  function remove(index) {
+      staff.splice(index, 1);
+      update();
+  }
+
+  function add() {
+      const newStaff = {
+          name: "",
+          venmo: "Cash"
+      };
+      staff.push(newStaff);
+      update();
+  }
+
+  function update() {
+      let tableStr = "";
+      for (let i = 0; i < staff.length; i++) {
+          tableStr += rowHTML
+              .replaceAll("INDEX", i)
+              .replaceAll("NAME", staff[i].name)
+              .replaceAll("VENMO", staff[i].venmo);
+      }
+      tableStr += addStaffHTML;
+      document.getElementById("table-body").innerHTML = tableStr;
+  }
+
+  function save() {
+      for (staffer of staff) {
+          if (staffer.name === "" || staffer.venmo === "") {
+              alert("Error: Enter info for all staff members before saving.");
+              return;
+          }
+      }
+      let data = new FormData();
+      data.append("staff", JSON.stringify(staff))
+      fetch("staff_save", {
+          "method": "POST",
+          "body": data
+      })
+        .then(response => response.text())
+        .then(message => {
+            if (message === "success") {
+                location.reload();
+            } else {
+                alert(message);
+            }
+        });
+  }
+
+</script>
+
+<h1>Staff</h1>
+
+<table>
+  <colgroup>
+    <col style="width:42.5%">
+    <col style="width:42.5%">
+    <col style="width:15%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Venmo</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="table-body">
+    <tr>
+      <td colspan="3">
+        <button class="add" onClick="add()">Add Staff Member</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<center>
+  <button id="save" onClick="save()">Save</button>
+</center>
+
+{% endblock %}

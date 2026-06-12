@@ -24,6 +24,9 @@ table {
     font-size: 1.5em;
     text-align: center;
 }
+.staffvenmo {
+    color: var(--hl);
+}
 .sub-th {
     color: white;
     font-weight: normal;
@@ -31,7 +34,17 @@ table {
 input {
     font-size: 1em;
     background-color: transparent;
-    color: yellow;
+    color: var(--hl);
+    border: none;
+    font-family: Times New Roman;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+}
+select {
+    font-size: 1em;
+    background-color: transparent;
+    color: var(--hl);
     border: none;
     font-family: Times New Roman;
     margin-left: 5%;
@@ -126,7 +139,7 @@ input {
         document.getElementById("cashIncome").value = data.cash;
         document.getElementById("venmoIncome").value = data.venmo;
 
-        for (performer of data.performers) {
+        for (const performer of data.performers) {
             let newPerformer = {
                 name: performer.name,
                 venmo: performer.venmo,
@@ -135,7 +148,7 @@ input {
             performers.push(newPerformer);
         }
 
-        for (staffer of data.staff) {
+        for (const staffer of data.staff) {
             let newStaff= {
                 name: staffer.name,
                 venmo: staffer.venmo,
@@ -148,13 +161,22 @@ input {
 
     });
 
+  let staffMembers = [];
+
+  fetch("staff_get")
+    .then(response => response.json())
+    .then(data => {
+        staffMembers = data;
+    });
+
   const performerRowHTML = `
     <tr id="performerINDEX">
       <td>
         <input id="performerINDEX-name"
                type="text"
                onChange="updatePerformer(INDEX)"
-               placeholder="NAME" />
+               placeholder="Enter name"
+               value="NAME" />
       </td>
       <td>
         <input id="performerINDEX-venmo"
@@ -172,17 +194,11 @@ input {
   const staffRowHTML = `
     <tr id="staffINDEX">
       <td>
-        <input id="staffINDEX-name"
-               type="text"
-               onChange="updateStaff(INDEX)"
-               placeholder="NAME" />
+        <select id="staffINDEX-name" onChange="updateStaff(INDEX)"> 
+          OPTIONS
+        </select> 
       </td>
-      <td>
-        <input id="staffINDEX-venmo"
-               type="text"
-               onChange="updateStaff(INDEX)"
-               value="VENMO" />
-      </td>
+      <td id="staffINDEX-venmo" class="staffvenmo">VENMO</td>
       <td>$PAYOUT</td>
       <td>
         <button class="remove" onClick="removeStaff(INDEX)">Remove</button>
@@ -291,11 +307,11 @@ input {
           }
       }
 
-      for (performer of performers) {
+      for (const performer of performers) {
           performer.payout = performerPayout; 
       }
 
-      for (staffer of staff) {
+      for (const staffer of staff) {
           staffer.payout = staffPayout; 
       }
 
@@ -306,7 +322,7 @@ input {
 
   function addPerformer() {
       let newPerformer = {
-          name: "None",
+          name: "",
           venmo: "Cash",
           payout: 0
       };
@@ -339,8 +355,8 @@ input {
 
   function addStaff() {
       let newStaff = {
-          name: "None",
-          venmo: "Cash",
+          name: "--SELECT--",
+          venmo: "",
           payout: 0
       };
       staff.push(newStaff);
@@ -348,9 +364,24 @@ input {
   }
 
   function updateStaff(index) {
-      staff[index].name = document.getElementById("staff" + index + "-name").value;
-      staff[index].venmo =
-              document.getElementById("staff" + index + "-venmo").value;
+
+      const name = document.getElementById("staff" + index + "-name").value;
+      let venmo = "";
+
+      for (const staffMember of staffMembers) {
+          if (staffMember.name === name) {
+              venmo = staffMember.venmo;
+              break;
+          }
+      }
+      //document.getElementById("staff" + index + "-venmo").textContent = venmo;
+
+      staff[index].name = name;
+      staff[index].venmo = venmo;
+
+
+      updateStaffTable();
+                      
   }
 
   function removeStaff(index) {
@@ -359,11 +390,35 @@ input {
   }
 
   function updateStaffTable() {
+      const staffNames = staff.map(staffer => staffer.name);
+      const staffmNames = staffMembers.map(staffer => staffer.name);
+
       let staffTableStr = "";
       for (let i = 0; i < staff.length; i++) {
+
+          let optionsStr = `
+            <option>
+              --SELECT-- 
+            </option>
+          `;
+          if (staff[i].name !== "--SELECT--") {
+              optionsStr += `
+                <option value="${staff[i].name}" selected>
+                  ${staff[i].name}
+                </option>
+              `;
+          }
+          for (const name of staffmNames.filter(x => !staffNames.includes(x))) {
+              optionsStr += `
+                <option value="${name}">
+                  ${name}
+                </option>
+              `;
+          }
+
           staffTableStr += staffRowHTML
               .replaceAll("INDEX", i)
-              .replaceAll("NAME", staff[i].name)
+              .replaceAll("OPTIONS", optionsStr)
               .replaceAll("VENMO", staff[i].venmo)
               .replaceAll("PAYOUT", staff[i].payout);
       }
@@ -373,7 +428,7 @@ input {
 
   function addPhotographer() {
       let newPhotographer = {
-          name: "None",
+          name: "",
           venmo: "Cash"
       };
       photographers.push(newPhotographer);
@@ -407,7 +462,7 @@ input {
 
   function addPosterArtist() {
       let newPosterArtist = {
-          name: "None",
+          name: "",
           venmo: "Cash"
       };
       posterArtists.push(newPosterArtist);
@@ -441,19 +496,25 @@ input {
 
       let date = document.getElementById("date").value;
       if (date === "") {
-          alert("Error: A date must be set to save or publish.");
+          alert("Error: set a date to save/publish.");
           return false;
       } else if (performers.length == 0) {
-          alert("Error: Need at least 1 performer to publish.");
+          alert("Error: set at least 1 performer to save/publish.");
           return false;
       } else if (staff.length == 0) {
-          alert("Error: Need at least 1 staff member to publish.");
+          alert("Error: set at least 1 staff member to save/publish.");
           return false;
       } else {
 
-          for (performer of performers) {
-              if (performer.name === "None") {
-                  alert("Error: Need to set performers' names to publish.");
+          for (const performer of performers) {
+              if (performer.name === "") {
+                  alert("Error: set all performers' names to save/publish.");
+                  return false;
+              }
+          }
+          for (const staffer of staff) {
+              if (staffer.name === "--SELECT--") {
+                  alert("Error: set all staffs' names to save/publish.");
                   return false;
               }
           }

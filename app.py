@@ -54,6 +54,21 @@ class Payout(db.Model):
             'date': self.date,
         }
 
+class Staff(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    venmo = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return f'<Staff id={self.id} name={self.name} venmo={self.venmo}>'
+
+    def serialize(self):
+        return {
+            'name': self.name,
+            'venmo': self.venmo
+        }
+
 with app.app_context():
     db.create_all()
 
@@ -122,6 +137,39 @@ def finances_get():
 def statement():
     return render_template('statement.html')
 
+@app.route('/staff')
+def staff():
+    return render_template('staff.html')
+
+@app.route('/staff_get')
+def staff_get():
+    staff_records = Staff.query.all()
+    return [i.serialize() for i in staff_records]
+
+@app.route('/staff_save', methods=['POST'])
+def staff_save():
+
+    if request.method == 'POST':
+
+        # remove all existing staff before adding new ones
+        old_staff = Staff.query.all()
+        for old_staffer in old_staff:
+            db.session.delete(old_staffer)
+
+        # adding new staff
+        staff = json.loads(request.form['staff'])
+        for staffer in staff:
+            staffer_record = Staff(name=staffer['name'],
+                                   venmo=staffer['venmo'])
+            db.session.add(staffer_record)
+
+        # commit changes to db
+        db.session.commit()
+
+        return 'success'
+
+    return 'Error: save failed (check logs).'
+
 @app.route('/payout')
 def payout():
     return render_template('payout.html')
@@ -181,7 +229,6 @@ def payout_save():
         saved_payout_records = Payout.query.filter_by(status=True).all()
         for record in saved_payout_records:
             db.session.delete(record)
-        db.session.commit()
 
         # create new income record
         income_record = Income(cash=int(request.form['cashIncome']),
@@ -189,7 +236,6 @@ def payout_save():
                                date=date_time,
                                status=True)
         db.session.add(income_record)
-        print(income_record)
 
         # create new records for performer payouts
         performers = json.loads(request.form['performers'])
@@ -222,12 +268,12 @@ def payout_save():
                              status=True)
         db.session.add(nest_record)
 
-        # commit new records to db
+        # commit changes to db
         db.session.commit()
 
         return "success" 
 
-    return "Error: Save failed (check logs)." 
+    return "Error: save failed (check logs)." 
 
 @app.route('/payout_publish', methods=['GET'])
 def payout_publish():
