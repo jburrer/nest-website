@@ -3,13 +3,13 @@
 {% block style %}
 @media screen and (max-width: 650px) {
     #intro {
-        padding-bottom: 4% !important;
+        margin-bottom: 2dvh !important;
     }
     table {
         font-size: 0.75em !important;
     }
     #show-tables {
-        padding-top: 4% !important;
+        margin-top: 2dvh !important;
     }
 }
 #intro {
@@ -19,6 +19,9 @@ table {
     font-size: 1.5em;
     table-layout: fixed;
     text-align: center;
+}
+.show-table {
+    margin-bottom: 2dvh;
 }
 .date-link {
     color: var(--alt-hl);
@@ -48,52 +51,74 @@ table {
 <script>
 
   const showTableTemplate = `
-    <h2 id="DATE_ID">
-      <a class="date-link" href="https://thenest207.live/finances#DATE_ID">DATE</a>
-    </h2>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Total</th>
-          <th>Nest</th>
-          <th>Staff</th>
-          <th>Artists</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>Total</th>
-          <td>INCOME</td>
-          <td>NEST_CUT</td>
-          <td>STAFF_TOTAL</td>
-          <td>PERF_TOTAL</td>
-        </tr>
-        <tr>
-          <th>Split Between</th>
-          <td></td>
-          <td>Nest</td>
-          <td>NUM_STAFF Staff Members</td>
-          <td>PERFORMERS</td>
-        </tr>
-        <tr>
-          <th>Each</th>
-          <td></td>
-          <td>NEST_CUT</td>
-          <td>STAFF_CUT</td>
-          <td>PERF_CUT</td>
-        </tr>
-      </tbody>
-    </table>
-    `
+    <div class="show-table">
+      <h2 id="DATE_ID">
+        <a class="date-link" href="https://thenest207.live/finances#DATE_ID">
+          DATE
+        </a>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Total</th>
+            <th>Split Between</th>
+            <th>Each</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Total</th>
+            <td>$INCOME</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Performers</th>
+            <td>$PERF_TOTAL</td>
+            <td>PERFORMERS</td>
+            <td>$PERF_CUT</td>
+          </tr>
+          <tr>
+            <th>Photography</th>
+            <td>$PHOTO_CUT</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Poster Art</th>
+            <td>$POST_CUT</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Location</th>
+            <td>$LOC_CUT</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Staff</th>
+            <td>$STAFF_TOTAL</td>
+            <td>NUM_STAFF Staff Members</td>
+            <td>$STAFF_CUT</td>
+          </tr>
+          <tr>
+            <th>Nest</th>
+            <td>$NEST_CUT</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
 
   fetch("finances_get")
     .then(response => response.json())
     .then(data => {
-
         let showTablesStr = "";
-        for (const [i, show] of data.entries()) {
-
+        for (const show of data) {
             const date = new Date(show.date)
                   .toLocaleDateString("en-US", {timeZone: "GMT"});
 
@@ -115,16 +140,12 @@ table {
                 .replaceAll("NUM_STAFF", show.numStaff)
                 .replaceAll("PERFORMERS", performers)
                 .replaceAll("STAFF_CUT", show.staffPayout)
-                .replaceAll("PERF_CUT", show.performers[0].payout);
-
-            if (i !== data.length -1) {
-                showTablesStr += "<br>";
-            }
-
+                .replaceAll("PERF_CUT", show.performers[0].payout)
+                .replaceAll("PHOTO_CUT", "0")
+                .replaceAll("POST_CUT", "0")
+                .replaceAll("LOC_CUT", "0");
         }
-
         document.getElementById("show-tables").innerHTML = showTablesStr;
-
     });
 
 </script>

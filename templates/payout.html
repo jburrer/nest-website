@@ -6,23 +6,24 @@
         font-size: 1em !important;
     }
     #intro {
-        padding-bottom: 4% !important;
+        padding-bottom: 2dvh !important;
     }
     #save {
         font-size: 1em !important;
-        margin-bottom: 4% !important;
+        margin-bottom: 2dvh !important;
     }
     #publish {
         font-size: 1em !important;
-        margin-bottom: 4% !important;
+        margin-bottom: 2dvh !important;
     }
 }
 #intro {
-    padding-bottom: 2%;
+    padding-bottom: 1dvh;
 }
 table {
     font-size: 1.5em;
     text-align: center;
+    margin-bottom: 2dvh;
 }
 .staffvenmo {
     color: var(--hl);
@@ -84,6 +85,7 @@ select {
     padding-left: 5%;
     padding-right: 5%;
     float: left;
+    margin-bottom: 1dvh;
 }
 #save:hover {
     border: 5px inset var(--alt-bg-1);
@@ -97,6 +99,7 @@ select {
     padding-left: 5%;
     padding-right: 5%;
     float: right;
+    margin-bottom: 1dvh;
 }
 #publish:hover {
     border: 5px inset var(--alt-bg-2);
@@ -364,7 +367,6 @@ select {
   }
 
   function updateStaff(index) {
-
       const name = document.getElementById("staff" + index + "-name").value;
       let venmo = "";
 
@@ -374,14 +376,11 @@ select {
               break;
           }
       }
-      //document.getElementById("staff" + index + "-venmo").textContent = venmo;
 
       staff[index].name = name;
       staff[index].venmo = venmo;
 
-
       updateStaffTable();
-                      
   }
 
   function removeStaff(index) {
@@ -611,7 +610,20 @@ select {
   </tbody>
 </table>
 
-<br>
+<table>
+  <colgroup>
+    <col style="width:30%">
+    <col style="width:70%">
+  </colgroup>  
+  <tbody>
+    <tr>
+      <th>Location Cut</th>
+      <td>
+        <input id="locationCut" type="number" value="0" onChange="" />
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 <table>
   <colgroup>
@@ -640,8 +652,6 @@ select {
   </tbody>
 </table>
 
-<br>
-
 <table>
   <colgroup>
     <col style="width:30%">
@@ -668,8 +678,6 @@ select {
     </tr>
   </tbody>
 </table>
-
-<br>
 
 <table>
   <colgroup>
@@ -698,8 +706,6 @@ select {
   </tbody>
 </table>
 
-<br>
-
 <table>
   <colgroup>
     <col style="width:30%">
@@ -727,8 +733,6 @@ select {
   </tbody>
 </table>
 
-<br>
-
 <table>
   <colgroup>
     <col style="width:30%">
@@ -742,8 +746,6 @@ select {
   </tbody>
 </table>
 
-<br>
-
 <button id="save" onClick="save()">Save</button>
 <button id="publish" onClick="publish()">Publish</button>
 
@@ -755,7 +757,5 @@ select {
     <button id="payout-link-copy" onClick="copyPayoutLink()">Copy</button>
   </p>
 </div>
-
-<br><br>
 
 {% endblock %}
