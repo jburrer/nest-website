@@ -8,9 +8,9 @@
     table {
         font-size: 0.75em !important;
     }
-    #show-tables {
-        margin-top: 2dvh !important;
-    }
+}
+#show-tables {
+    margin-top: 2dvh;
 }
 #intro {
     padding-bottom: 2%;
@@ -25,6 +25,8 @@ table {
 }
 .date-link {
     color: var(--alt-hl);
+    font-size: 1.5em;
+    text-decoration: none;
 }
 {% endblock %}
 
@@ -52,15 +54,16 @@ table {
 
   const showTableTemplate = `
     <div class="show-table">
-      <h2 id="DATE_ID">
-        <a class="date-link" href="https://thenest207.live/finances#DATE_ID">
-          DATE
-        </a>
-      </h2>
       <table>
         <thead>
           <tr>
-            <th></th>
+            <th>
+              <a class="date-link"
+                 id="DATE_ID"
+                 href="https://thenest207.live/finances#DATE_ID">
+                DATE
+              </a>
+            </th>
             <th>Total</th>
             <th>Split Between</th>
             <th>Each</th>

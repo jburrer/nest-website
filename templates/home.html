@@ -5,6 +5,7 @@
     #top {
         flex-direction: column !important;
         height: unset !important;
+        margin-bottom: 2dvh !important;
     }
     #logobox {
         width: 100% !important;
@@ -22,20 +23,16 @@
     }
     #linkbox {
         margin: auto !important;
-        margin-top: 3% !important;
+        margin-top: 3dvh !important;
         height: 5dvh !important;
-    }
-    #middle {
-        height: unset !important;
-        padding-top: 3% !important;
     }
     #bottom {
         flex-direction: column !important;
         height: unset !important;
     }
-    #left, #right {
+    #bottom-left, #bottom-right {
         width: 100% !important;
-        margin-bottom: 2% !important;
+        margin-bottom: 1dvh !important;
     }
 }
 h1 {
@@ -44,27 +41,18 @@ h1 {
 h2 {
     font-size: 125%;
 }
-#container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
 #top {
     display: flex;
     flex-direction: row;
     align-items: center;
     height: 30%;
 }
-#middle {
-    display: flex;
-    flex-direction: column;
-    height: 15%;
-    padding-bottom: 2%;
-}
 #bottom {
     display: flex;
     flex-direction: row;
-    height: 53%;
+    height: 48dvh;
+    margin-top: 1dvh;
+    margin-bottom: 1dvh;
 }
 #logobox {
     width: 40%;
@@ -96,45 +84,67 @@ h2 {
     border: 5px inset var(--alt-bg-1);
     padding-top: 5px;
 }
-#left {
+#press-box-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1dvh;
+}
+.press-row {
+    display: flex;
+    flex-direction: row;
+}
+.press-box {
+    background-color: var(--alt-bg-2);
+    border: 5px outset var(--alt-bg-2);
+    padding: 1dvh;
+    padding-bottom: 2dvh;
+    width: 50%;
+}
+.press-box a {
+    text-decoration: none;
+}
+.press-box:hover {
+    border: 5px inset var(--alt-bg-2);
+}
+#bottom-left {
     width: 50%;
     height: 100%;
 }
-#right {
+#bottom-right {
     width: 50%;
     height: 100%;
 }
-#left a, #right a {
+#bottom-left a, #bottom-right a {
     height: 90%;
     display: block;
-    padding: 2%;
+    padding: 1dvh;
     text-align: center;
     text-decoration: none;
 }
-#left a {
+#bottom-left a {
     background-color: var(--alt-bg);
     border: 5px outset var(--alt-bg);
-    margin: 2%;
+    margin: 1dvh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#left a:hover {
+#bottom-left a:hover {
     border: 5px inset var(--alt-bg);
 }
-#right a {
-    background-color: var(--alt-bg-2);
-    border: 5px outset var(--alt-bg-2);
-    margin: 2%;
+#bottom-right a {
+    background-color: var(--alt-bg-3);
+    border: 5px outset var(--alt-bg-3);
+    margin: 1dvh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#right a:hover {
-    border: 5px inset var(--alt-bg-2);
+#bottom-right a:hover {
+    border: 5px inset var(--alt-bg-3);
 }
 #bottom img {
-    margin-bottom: 2% !important;
+    margin-bottom: 1dvh !important;
 }
 {% endblock %}
 
@@ -170,15 +180,13 @@ h2 {
   
   </div>
 
-  <div id="middle">
-    <p>&emsp;&emsp;
+  <p>&emsp;&emsp;
 The Nest is a nonprofit worker cooperative music venue located in West Lafayette, Indiana. We provide a space for our local scene to thrive as well as for both Purdue students and Lafayette-area locals to participate in a vibrant, in-person community. We started in 2023 as a pair of Purdue students running DIY shows out of our basement, but we've since grown into an entertainment cooperative with 20 staff members opening our own all-ages brick and mortar music venue!
-    </p>
-  </div>
-  
+  </p>
+
   <div id="bottom">
 
-    <div id="left">
+    <div id="bottom-left">
       <a href="/donate">
         <div>
           <img src="{{ url_for('static', filename='gofundme.jpg') }}"
@@ -188,7 +196,7 @@ The Nest is a nonprofit worker cooperative music venue located in West Lafayette
       </a>
     </div>
     
-    <div id="right">
+    <div id="bottom-right">
       <a href="/merch">
         <div>
           <img src="{{ url_for('static', filename='merch.jpg') }}"
@@ -198,6 +206,71 @@ The Nest is a nonprofit worker cooperative music venue located in West Lafayette
       </a>
     </div>
 
+  </div>
+
+  <center>
+    <h1>News Coverage</h1>
+  </center>
+  <div id="press-box-container">
+    <div class="press-row">
+      <div class="press-box" id="press-box-r1-left">
+        <a target="_blank"       href="https://www.purdueexponent.org/city_state/general_news/the-nest-music-venue-comeback/article_d5f66ab6-cc9a-46cc-8dd3-e30efbf698f1.html">
+          <h2>
+            Local music venue plans permanent comeback after
+            facing near-extinction
+          </h2>
+          <h3>Purdue Exponent</h3>
+        </a>
+      </div>
+      <div class="press-box" id="press-box-r1-right">
+        <a target="_blank" href="https://www.purdueexponent.org/city_state/features/purdue-west-lafayette-music-diy/article_6d8e153f-7a36-42fc-bb6a-034ad5f76d0b.html">
+          <h2>
+            Lurking below West Lafayette,
+            a guide to underground music
+          </h2>
+          <h3>Purdue Exponent</h3>
+        </a>
+      </div>
+    </div>
+    <div class="press-row">
+      <div class="press-box" id="press-box-r2-left">
+        <a target="_blank" href="https://www.basedinlafayette.com/p/purdue-live-music-promoters-look">
+          <h2>
+            Purdue live music promoters look for a new,
+            all-ages ‘Nest’
+          </h2>
+          <h3>Dave Bangert</h3>
+        </a>
+      </div>
+      <div class="press-box" id="press-box-r2-right">
+        <a target="_blank" href="https://www.purdueexponent.org/multimedia/videos/halloweekend-at-the-nest/video_3a852de2-4c83-54c5-b168-40bb83d946d6.html">
+          <h2>
+            Halloweekend At The Nest
+          </h2>
+          <h3>Purdue Exponent</h3>
+        </a>
+      </div>
+    </div>
+    <div class="press-row">
+      <div class="press-box" id="press-box-r3-left">
+        <a target="_blank" href="https://www.purdueexponent.org/city_state/features/venue-forced-to-relocate-after-being-shut-down/article_9c646d14-94dd-4a70-86f9-6839297a9c90.html">
+          <h2>
+            Local music venue forced to relocate
+            after being shut down back-to-back years
+          </h2>
+          <h3>Purdue Exponent</h3>
+        </a>
+      </div>
+      <div class="press-box" id="press-box-r3-right">
+        <a target="_blank" href="https://www.purdueexponent.org/city_state/features/the-nest-restructures-after-removing-co-owner-from-project/article_36e41146-dc2a-4aae-9bc6-60e2e608a8ba.html">
+          <h2>
+            The Nest restructures after
+            removing co-owner from project 
+          </h2>
+          <h3>Purdue Exponent</h3>
+        </a>
+      </div>
+    </div>
   </div>
 
 </div>
