@@ -112,6 +112,9 @@ h2 {
 .press-box:hover {
     border: 5px inset var(--alt-bg-2);
 }
+#sponsors {
+    padding: 1dvh;
+}
 #bottom-left {
     width: 50%;
     height: 100%;
@@ -278,6 +281,17 @@ The Nest is a nonprofit worker cooperative music venue located in West Lafayette
       </div>
     </div>
   </div>
+
+  <center>
+    <h1>Sponsored By</h1>
+    <div id="sponsors">
+      <a  target="_blank"
+          href="https://www.pridelafayette.org/">
+        <img src="{{ url_for('static', filename='pride-lafayette-logo.png') }}"
+             width="300px">
+      </a>
+    </div>
+  </center>
 
 </div>
 
