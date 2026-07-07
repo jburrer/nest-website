@@ -118,6 +118,12 @@ def finances_get():
                                                       date=income_record.date,
                                                       role='staff').all()
 
+        poster_payout_record = Payout.query.filter_by(status=False,
+                                                      date=income_record.date,
+                                                      role='poster-artist').first()
+        location_payout_record = Payout.query.filter_by(status=False,
+                                                        date=income_record.date,
+                                                        role='location').first()
         nest_payout_record = Payout.query.filter_by(status=False,
                                                     date=income_record.date,
                                                     role='nest').first()
@@ -128,6 +134,8 @@ def finances_get():
             'performers': performers,
             'numStaff': len(staff_payout_records),
             'staffPayout': staff_payout_records[0].payout,
+            'posterCut': poster_payout_record.payout,
+            'locationCut': location_payout_record.payout,
             'nestCut': nest_payout_record.payout
         })
 
@@ -192,6 +200,18 @@ def payout_get():
     saved_staff_records = Payout.query.filter_by(status=True,
                                                  role='staff').all()
 
+    poster_payout = 0
+    saved_poster_record = Payout.query.filter_by(status=True,
+                                                 role='poster').first()
+    if saved_poster_record is not None:
+        poster_payout = saved_poster_record.payout
+
+    location_payout = 0
+    saved_location_record = Payout.query.filter_by(status=True,
+                                                   role='location').first()
+    if saved_location_record is not None:
+        location_payout = saved_location_record.payout
+    
     nest_payout = 0
     saved_nest_record = Payout.query.filter_by(status=True,
                                                role='nest').first()
@@ -204,9 +224,10 @@ def payout_get():
         'venmo': venmo,
         'performers': [i.serialize() for i in saved_performer_records],
         'staff': [i.serialize() for i in saved_staff_records],
+        'posterCut': poster_payout,
+        'locationCut': location_payout,
         'nestCut': nest_payout
     }
-
 
 @app.route('/payout_save', methods=['POST'])
 def payout_save():
@@ -258,6 +279,24 @@ def payout_save():
                                   date=date_time,
                                   status=True)
             db.session.add(staff_record)
+
+        # create new record for poster artist payout
+        poster_record = Payout(name='Poster Artist',
+                             venmo='N/A',
+                             role='poster-artist',
+                             payout=int(request.form['posterCut']),
+                             date=date_time,
+                             status=True)
+        db.session.add(poster_record)
+
+        # create new record for location payout
+        location_record = Payout(name='Location',
+                             venmo='N/A',
+                             role='location',
+                             payout=int(request.form['locationCut']),
+                             date=date_time,
+                             status=True)
+        db.session.add(location_record)
 
         # create new record for nest payout
         nest_record = Payout(name='Nest',

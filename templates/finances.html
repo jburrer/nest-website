@@ -40,8 +40,8 @@ table {
 <h1>Finances</h1>
 
 <div id="intro">
-  <p>&emsp;&emsp;<b>For summer shows, the Nest receives an equal cut to that of the bands, which is then split between the staff working that event.</b></p>
-  <p>&emsp;&emsp;For instance, for a show that brought in $100 with 4 bands and 4 staff, the cut will be split 5 ways, which each band getting $20 and the staff splitting the additional $20 to each get $5. For simplicity, each cut is rounded down to the nearest whole dollar, and any dollars left over remain with the Nest.</p>
+  <p>&emsp;&emsp;<b>For summer shows, all income from door is split evenly between each band, the show location (unless it's at Pride Lafayette), the poster artist, and the Nest. The Nest's cut is then split between the staff working that event.</b></p>
+  <p>&emsp;&emsp;For instance, for a show that brought in $100 with 4 bands and 2 staff, the cut will be split 7 ways, which each band, as well as the poster artist and location, getting $14 and the staff splitting their $14 to each get $7. For simplicity, each cut is rounded down to the nearest whole dollar, and any dollars left over remain with the Nest. In this example, the Nest gets the remaining $2.</p>
 </div>
 
 <center>
@@ -145,8 +145,8 @@ table {
                 .replaceAll("STAFF_CUT", show.staffPayout)
                 .replaceAll("PERF_CUT", show.performers[0].payout)
                 .replaceAll("PHOTO_CUT", "0")
-                .replaceAll("POST_CUT", "0")
-                .replaceAll("LOC_CUT", "0");
+                .replaceAll("POST_CUT", show.posterCut)
+                .replaceAll("LOC_CUT", show.locationCut);
         }
         document.getElementById("show-tables").innerHTML = showTablesStr;
     });
