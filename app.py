@@ -145,17 +145,17 @@ def finances_get():
 def statement():
     return render_template('statement.html')
 
-@app.route('/staff')
-def staff():
-    return render_template('staff.html')
+@app.route('/contacts')
+def contacts():
+    return render_template('contacts.html')
 
-@app.route('/staff_get')
-def staff_get():
+@app.route('/contacts_get')
+def contacts_get():
     staff_records = Staff.query.all()
     return [i.serialize() for i in staff_records]
 
-@app.route('/staff_save', methods=['POST'])
-def staff_save():
+@app.route('/contacts_save', methods=['POST'])
+def contacts_save():
 
     if request.method == 'POST':
 

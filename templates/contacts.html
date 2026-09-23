@@ -16,6 +16,7 @@ table {
     font-size: 1.5em;
     table-layout: fixed;
     text-align: center;
+    margin-bottom: 2dvh;
 }
 input {
     font-size: 1em;
@@ -60,7 +61,6 @@ input {
     font-size: 1.5em;
     padding-left: 5%;
     padding-right: 5%;
-    margin-top: 2dvh;
     margin-bottom: 1dvh;
 }
 #save:hover {
@@ -72,91 +72,213 @@ input {
 
 <script>
 
+  let performers = [];
   let staff = [];
+  let photographers = [];
+  let posterArtists = [];
+  let locations = [];
 
-  fetch("staff_get")
+  const roles = [
+      {
+          name: "performers",
+          list: performers
+      },
+      {
+          name: "staff",
+          list: staff 
+      },
+      {
+          name: "photographers",
+          list: photographers 
+      },
+      {
+          name: "poster",
+          list: posterArtists 
+      },
+      {
+          name: "locations",
+          list: locations 
+      }
+  ];
+
+  // title case helper function
+  function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+    );
+  }
+
+  fetch("contacts_get")
     .then(response => response.json())
     .then(data => {
-        staff = data;
+
+        console.log(data);
+
+        //staff = data;
         update();
     });
 
   const rowHTML = `
-    <tr id="staffINDEX">
+    <tr>
       <td>
-        <input id="staffINDEX-name"
+        <input id="ROLE-INDEX-name"
                type="text"
-               onChange="updateName(INDEX)"
+               onChange="updateName('ROLE', INDEX)"
                placeholder="Enter name"
                value="NAME" />
       </td>
       <td>
-        <input id="staffINDEX-venmo"
+        <input id="ROLE-INDEX-payas"
                type="text"
-               onChange="updateVenmo(INDEX)"
+               onChange="updatePayAs('ROLE', INDEX)"
                placeholder="@"
-               value="VENMO" />
+               value="PAYAS" />
       </td>
       <td>
-        <button class="remove" onClick="remove(INDEX)">Remove</button>
+        <button class="remove" onClick="remove('ROLE', INDEX)">Remove</button>
       </td>
     </tr>
   `;
 
-  const addStaffHTML = `
+  const addHTML = `
     <tr>
       <td colspan="3">
-        <button class="add" onClick="add()">Add Staff Member</button>
+        <button class="add" onClick="add('ROLE')">Add TITLE</button>
       </td>
     </tr>
   `
 
-  function updateName(index) {
-      staff[index].name =
-              document.getElementById("staff" + index + "-name").value;
+  function updateName(role, index) {
+      let roleList = [];
+      switch (role) {
+        case "performers":
+          roleList = performers;
+          break;
+        case "staff":
+          roleList = staff;
+          break;
+        case "photographers":
+          roleList = photographers;
+          break;
+        case "poster":
+          roleList = posterArtists;
+          break;
+        default:
+          roleList = locations;
+      }
+      roleList[index].name =
+              document.getElementById(role + "-" + index + "-name").value;
   }
 
-  function updateVenmo(index) {
-      staff[index].venmo =
-              document.getElementById("staff" + index + "-venmo").value;
+  function updatePayAs(role, index) {
+      let roleList = [];
+      switch (role) {
+        case "performers":
+          roleList = performers;
+          break;
+        case "staff":
+          roleList = staff;
+          break;
+        case "photographers":
+          roleList = photographers;
+          break;
+        case "poster":
+          roleList = posterArtists;
+          break;
+        default:
+          roleList = locations;
+      }
+      roleList[index].payas =
+              document.getElementById(role + "-" + index + "-payas").value;
   }
 
-  function remove(index) {
-      staff.splice(index, 1);
+  function remove(role, index) {
+      let roleList = [];
+      switch (role) {
+        case "performers":
+          roleList = performers;
+          break;
+        case "staff":
+          roleList = staff;
+          break;
+        case "photographers":
+          roleList = photographers;
+          break;
+        case "poster":
+          roleList = posterArtists;
+          break;
+        default:
+          roleList = locations;
+      }
+      roleList.splice(index, 1);
       update();
   }
 
-  function add() {
-      const newStaff = {
+  function add(role) {
+      let roleList = [];
+      switch (role) {
+          case "performers":
+              roleList = performers;
+              break;
+          case "staff":
+              roleList = staff;
+              break;
+          case "photographers":
+              roleList = photographers;
+              break;
+          case "poster":
+              roleList = posterArtists;
+              break;
+          default:
+              roleList = locations;
+      }
+      roleList.push({
           name: "",
-          venmo: "Cash"
-      };
-      staff.push(newStaff);
+          payas: "Cash"
+      });
       update();
   }
 
   function update() {
-      let tableStr = "";
-      for (let i = 0; i < staff.length; i++) {
-          tableStr += rowHTML
-              .replaceAll("INDEX", i)
-              .replaceAll("NAME", staff[i].name)
-              .replaceAll("VENMO", staff[i].venmo);
+      for (const role of roles) {
+          let tableStr = "";
+          for (let i = 0; i < role.list.length; i++) {
+              tableStr += rowHTML
+                  .replaceAll("ROLE", role.name)
+                  .replaceAll("INDEX", i)
+                  .replaceAll("NAME", role.list[i].name)
+                  .replaceAll("PAYAS", role.list[i].payas);
+          }
+          tableStr += addHTML
+              .replaceAll("ROLE", role.name)
+              .replaceAll("TITLE", toTitleCase(role.name));
+          document.getElementById(role.name + "-table-body").innerHTML = tableStr;
       }
-      tableStr += addStaffHTML;
-      document.getElementById("table-body").innerHTML = tableStr;
   }
 
   function save() {
-      for (staffer of staff) {
-          if (staffer.name === "" || staffer.venmo === "") {
-              alert("Error: Enter info for all staff members before saving.");
-              return;
+
+      let data = new FormData();
+      let contacts = []
+      for (const role of roles) {
+          for (member of role.list) {
+              if (member.name === "" || member.payas === "") {
+                  alert("Error: Enter info for all members before saving.");
+                  return;
+              }
+              contacts.append({
+                  role: role.name,
+                  name: member.name,
+                  payas: member.payas
+              });
           }
       }
-      let data = new FormData();
-      data.append("staff", JSON.stringify(staff))
-      fetch("staff_save", {
+      data.append("contacts", JSON.stringify(contacts));
+
+      console.log(data);
+
+      fetch("contacts_save", {
           "method": "POST",
           "body": data
       })
@@ -168,13 +290,14 @@ input {
                 alert(message);
             }
         });
+
   }
 
 </script>
 
 <h1>Contacts</h1>
 
-<h2>Contacts</h2>
+<h2>Performers</h2>
 <table>
   <colgroup>
     <col style="width: 40%">
@@ -184,14 +307,106 @@ input {
   <thead>
     <tr>
       <th>Name</th>
-      <th>Venmo</th>
+      <th>Pay As</th>
       <th>Action</th>
     </tr>
   </thead>
-  <tbody id="table-body">
+  <tbody id="performers-table-body">
     <tr>
       <td colspan="3">
-        <button class="add" onClick="add()">Add Staff Member</button>
+        <button class="add" onClick="add('performers')">Add Performer</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Staff</h2>
+<table>
+  <colgroup>
+    <col style="width: 40%">
+    <col style="width: 40%">
+    <col style="width: 20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Pay As</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="staff-table-body">
+    <tr>
+      <td colspan="3">
+        <button class="add" onClick="add('staff')">Add Staff Member</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Photographers</h2>
+<table>
+  <colgroup>
+    <col style="width: 40%">
+    <col style="width: 40%">
+    <col style="width: 20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Pay As</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="photographers-table-body">
+    <tr>
+      <td colspan="3">
+        <button class="add" onClick="add('photographers')">Add Photographer</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Poster Artists</h2>
+<table>
+  <colgroup>
+    <col style="width: 40%">
+    <col style="width: 40%">
+    <col style="width: 20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Pay As</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="poster-table-body">
+    <tr>
+      <td colspan="3">
+        <button class="add" onClick="add('poster')">Add Poster Artist</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Locations</h2>
+<table>
+  <colgroup>
+    <col style="width: 40%">
+    <col style="width: 40%">
+    <col style="width: 20%">
+  </colgroup>  
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Pay As</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="locations-table-body">
+    <tr>
+      <td colspan="3">
+        <button class="add" onClick="add('locations')">Add Location</button>
       </td>
     </tr>
   </tbody>
